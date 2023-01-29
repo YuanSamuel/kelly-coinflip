@@ -11,7 +11,7 @@ function Simulator({ data }) {
   const [flipping, setFlipping] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [balance, setBalance] = useState(10000);
-  const [winPct, setWinPct] = useState(0.6);
+  const [winPct, setWinPct] = useState(60);
 
   const onSubmit = (data) => {
     console.log(data);

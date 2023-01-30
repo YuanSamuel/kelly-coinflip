@@ -48,7 +48,7 @@ def update_bet(user_id: str, bet_amount: float):
     if flip_results > 0:
         db[user_id] += bet_amount
     else:
-        db[user_id] = min(db[user_id] - bet_amount, 0)
+        db[user_id] = max(db[user_id] - bet_amount, 0)
 
     return db[user_id]
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { set, useForm } from 'react-hook-form';
 import axios from 'axios';
 
-function Simulator({ data }) {
+function Simulator() {
   const { register, handleSubmit, reset } = useForm();
 
   const [name, setName] = useState('');
@@ -13,26 +13,49 @@ function Simulator({ data }) {
   const [balance, setBalance] = useState(10000);
   const [winPct, setWinPct] = useState(60);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
     setName(data.name);
     localStorage.setItem('name', data.name);
+    setFlipping(true);
+    await axios.post(`https://k89480.deta.dev/add-user/${data.name}`);
+    const response = await axios.get(
+      `https://k89480.deta.dev/curr-amount/${data.name}`
+    );
+    console.log(response);
+    setFlipping(false);
     setRound(1);
   };
 
-  const handleSubmitBet = (data) => {
+  const handleSubmitBet = async (data) => {
     console.log(data);
     setRound(parseInt(round) + 1);
     setFlipping(true);
+    const response = await axios.get(
+      `https://k89480.deta.dev/update-bet/${name}?bet_amount=${data.bet}`
+    );
+    console.log(response);
+    let newBal = parseInt(response.data);
+    setResult(newBal > balance);
+    setBalance(newBal);
+    setTimeout(() => {
+      setFlipping(false);
+      setShowResult(true);
+    }, 500);
     reset({
-      bet: ''
-    })
-  
+      bet: '',
+    });
   };
 
   useEffect(() => {
-    setName(localStorage.getItem('name'));
+    let id = localStorage.getItem('name');
+    setName(id);
     setRound(parseInt(localStorage.getItem('round')));
+    axios
+      .get(`https://k89480.deta.dev/curr-amount/${id}`)
+      .then(function (response) {
+        console.log(response);
+      });
   }, []);
 
   useEffect(() => {
@@ -43,16 +66,12 @@ function Simulator({ data }) {
   }, [round]);
 
   useEffect(() => {
-    if (flipping) {
+    if (showResult) {
       setTimeout(() => {
-        setFlipping(false);
-        setShowResult(true);
-        setTimeout(() => {
-          setShowResult(false);
-        }, 2000);
-      }, 1000);
+        setShowResult(false);
+      }, 2000);
     }
-  }, [flipping]);
+  }, [showResult]);
 
   if (name === '' || name === null) {
     return (

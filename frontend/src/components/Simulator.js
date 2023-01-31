@@ -18,11 +18,7 @@ function Simulator() {
     setName(data.name);
     localStorage.setItem('name', data.name);
     setFlipping(true);
-    await axios.post(`https://k89480.deta.dev/add-user/${data.name}`);
-    const response = await axios.get(
-      `https://k89480.deta.dev/curr-amount/${data.name}`
-    );
-    console.log(response);
+    await axios.post(`https://kc.itssamuelyuan.repl.co/add-user/${data.name}`);
     setFlipping(false);
     setRound(1);
   };
@@ -32,16 +28,20 @@ function Simulator() {
     setRound(parseInt(round) + 1);
     setFlipping(true);
     const response = await axios.get(
-      `https://k89480.deta.dev/update-bet/${name}?bet_amount=${data.bet}`
+      `https://kc.itssamuelyuan.repl.co/update-bet/${name}?bet_amount=${data.bet}`
     );
     console.log(response);
     let newBal = parseInt(response.data);
-    setResult(newBal > balance);
+    if (newBal === balance) {
+      setResult(Math.random() < 0.6);
+    } else {
+      setResult(newBal > balance);
+    }
     setBalance(newBal);
     setTimeout(() => {
       setFlipping(false);
       setShowResult(true);
-    }, 500);
+    }, 200);
     reset({
       bet: '',
     });
@@ -49,13 +49,17 @@ function Simulator() {
 
   useEffect(() => {
     let id = localStorage.getItem('name');
+    setFlipping(true);
     setName(id);
     setRound(parseInt(localStorage.getItem('round')));
-    axios
-      .get(`https://k89480.deta.dev/curr-amount/${id}`)
-      .then(function (response) {
-        console.log(response);
-      });
+    if (id !== null) {
+      axios
+        .get(`https://kc.itssamuelyuan.repl.co/curr-amount/${id}`)
+        .then(function (response) {
+          setBalance(response.data);
+          setFlipping(false);
+        });
+    }
   }, []);
 
   useEffect(() => {
@@ -69,7 +73,7 @@ function Simulator() {
     if (showResult) {
       setTimeout(() => {
         setShowResult(false);
-      }, 2000);
+      }, 1000);
     }
   }, [showResult]);
 
@@ -96,7 +100,7 @@ function Simulator() {
         </form>
       </div>
     );
-  } else if (round < 21) {
+  } else if (round < 21 || flipping || showResult) {
     if (!flipping && !showResult) {
       return (
         <div className='relative flex flex-col justify-center items-center w-full h-full'>
@@ -110,7 +114,10 @@ function Simulator() {
             </h2>
           </div>
 
-          <form className='flex flex-col justify-around items-center'>
+          <form
+            className='flex flex-col justify-around items-center'
+            onSubmit={handleSubmit(handleSubmitBet)}
+          >
             <div className='flex flex-row justify-around items-center mb-10'>
               <label className='text-xl mr-4'>Bet Amount: </label>
               <input
@@ -118,10 +125,7 @@ function Simulator() {
                 {...register('bet', { pattern: /^\d+$/ })}
               />
             </div>
-            <button
-              className='text-xl rounded-xl px-4 py-1 bg-blue-400 text-white cursor-pointer'
-              onClick={handleSubmitBet}
-            >
+            <button className='text-xl rounded-xl px-4 py-1 bg-blue-400 text-white cursor-pointer'>
               Submit
             </button>
           </form>

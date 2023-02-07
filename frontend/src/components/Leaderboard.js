@@ -25,7 +25,7 @@ function Leaderboard() {
       }
       setPositions(p);
       console.log(p);
-    }, 2000);
+    }, 5000);
   }, []);
 
   return (

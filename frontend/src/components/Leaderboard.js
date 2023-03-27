@@ -9,7 +9,7 @@ function Leaderboard() {
   useEffect(() => {
     setInterval(async () => {
       const response = await axios.get(
-        'https://kc.itssamuelyuan.repl.co/leaderboard'
+        'https://kc.itssamuelyuan.repl.co/leaderboard2'
       );
       let p = Object.entries(response.data);
       p.sort((a, b) => b[1] - a[1]);
@@ -25,7 +25,7 @@ function Leaderboard() {
       }
       setPositions(p);
       console.log(p);
-    }, 50000);
+    }, 10000);
   }, []);
 
   return (

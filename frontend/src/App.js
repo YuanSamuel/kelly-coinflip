@@ -18,12 +18,12 @@ function App() {
         UCF Kelly Coinflip Sim
       </header>
       <div className='flex flex-row mx-2.5 mt-5 mb-10 justify-around min-h-full flex-auto'>
-        <div className='w-[75%] p-5 bg-white rounded-xl 23min-h-full'>
+        <div className='w-[94%] p-5 bg-white rounded-xl 23min-h-full'>
           <Simulator />
         </div>
-        <div className='w-[20%] '>
+        {/* <div className='w-[80%] '>
           <Leaderboard />
-        </div>
+        </div> */}
       </div>
     </div>
   );
